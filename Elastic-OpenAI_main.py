@@ -16,9 +16,6 @@ import json
 import yaml
 import tiktoken
 
-
-
-
 now = datetime.now();
 dt_string = now.strftime("%m%d%Y %H:%M:%S")
 
@@ -29,9 +26,9 @@ def es_connect(cid, user, passwd):
     return es
 
 # Search Queries to be executed
-def search(query_txt, username, password, cloud_id1, index_name):
+def search(query_txt, username, password, cloud_id, index_name):
 
-    es = es_connect(cloud_id1, username, password)
+    es = es_connect(cloud_id, username, password)
     query = {
         "text_expansion": {
             "ml.inference.body_content_expanded.predicted_value": {
@@ -50,9 +47,9 @@ def search(query_txt, username, password, cloud_id1, index_name):
     return body, url
 
 
-def search_elser(query_txt, username, password, cloud_id1, index_name):
+def search_elser(query_txt, username, password, cloud_id, index_name):
 
-    es = es_connect(cloud_id1, username, password)
+    es = es_connect(cloud_id, username, password)
     query = {
         "text_expansion": {
             "ml.inference.body_content_expanded.predicted_value": {
@@ -68,9 +65,9 @@ def search_elser(query_txt, username, password, cloud_id1, index_name):
     hit = resp['hits']['hits']
     return hit
 
-def search_bm25(query_txt, username, password, cloud_id1, index_name):
+def search_bm25(query_txt, username, password, cloud_id, index_name):
 
-    es = es_connect(cloud_id1, username, password)
+    es = es_connect(cloud_id, username, password)
     query = {
         "match": {
             "body_content": query_txt
@@ -122,13 +119,11 @@ def listToString(s):
 
 # Main Starts here
 def main(ivalue=None):
-    cloud_id1 = ""
+    cloud_id = ""
     password = ""
     username = ""
     openai.api_key = ""
     index_name = "search-elastic-docs"
-
-
 
     st.title("Compare three ways to search with Elsasticsearch")
     with st.form("chat_form"):
@@ -143,7 +138,7 @@ def main(ivalue=None):
         elser_col.subheader("ESRE Search")
         bm25col.subheader("Keyword Search")
 
-        resp, url = search(query, username, password, cloud_id1, index_name)
+        resp, url = search(query, username, password, cloud_id, index_name)
         prompt = f"Answer this question: {query}\nUsing only the information from Elastic.co Website: {resp}\nIf the answer is not contained in the supplied doc reply '{negResponse}' and nothing else"
         answer, word_count, openai_token_count = chat_gpt(prompt)
         #print("prompt>", prompt)
@@ -157,7 +152,7 @@ def main(ivalue=None):
             gpt_col.write(f"ChatGPT: {answer.strip()}\n\nArticle-url: {url}")
 
         try:
-            hit = search_elser(query, username, password, cloud_id1, index_name)
+            hit = search_elser(query, username, password, cloud_id, index_name)
             hit_str = json.dumps(hit)
             hit_dict = json.loads(hit_str)
             #print(hit_dict)
@@ -172,7 +167,7 @@ def main(ivalue=None):
               print(error)
 
         try:
-            hit = search_bm25(query, username, password, cloud_id1, index_name)
+            hit = search_bm25(query, username, password, cloud_id, index_name)
             hit_str = json.dumps(hit)
             hit_dict = json.loads(hit_str)
             #print(hit_dict)
