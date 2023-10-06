@@ -2,7 +2,7 @@
 
 Open the file Elastic-OpenAI_main.py
 
-Find section “Main Starts here” and fill the following parameter to the script:
+Find section “Main Starts here” and fill the following parameters in the script:
 
 cloud_id = "your cloud id"
 
