@@ -1,0 +1,8 @@
+streamlit
+openai
+elasticsearch
+requests
+datetime
+json
+yaml
+tiktoken
